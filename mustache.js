@@ -81,12 +81,16 @@ var Mustache = function() {
     */
     render_partial: function(name, context, partials) {
       if(!partials || !partials[name]) {
-        throw({message: "unknown_partial '" + name + "'"});
+        throw({message: "unknown_partial"});
       }
-      if(typeof(context[name]) != "object") {
-        return partials[name];
+      if(context[name]) {
+        if(typeof(context[name]) != "object") {
+          throw({message: "subcontext for '" + name + "' is not an object"});
+        }
+        return this.render(partials[name], context[name], partials, true);          
+      } else {
+        return this.render(partials[name], context, partials, true);
       }
-      return this.render(partials[name], context[name], partials, true);
     },
 
     /*
