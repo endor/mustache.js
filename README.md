@@ -88,6 +88,88 @@ the items. Use `{{.}}` to access the current item inside the enumeration section
     Joe's shopping card: <ul><li>bananas</li><li>apples</li></ul>
 
 
+### Higher Order Sections
+
+If a section key returns a function, it will be called and passed both the unrendered
+block of text and a renderer convenience function.
+
+Given this JS:
+
+    "name": "Tater",
+    "bolder": function() {
+      return function(text, render) {
+        return "<b>" + render(text) + '</b>'
+      }
+    }
+
+And this template:
+
+    {{#bolder}}Hi {{name}}.{{/bolder}}
+
+We'll get this output:
+
+    <b>Hi Tater.</b>
+
+As you can see, we're pre-processing the text in the block. This can be used to
+implement caching, filters (like syntax highlighting), etc.
+
+You can use `this.name` to access the attribute `name` from your view.
+
+### Dereferencing Section
+
+If you have a nested object structure in your view, it can sometimes be easier
+to use sections like this:
+
+    var objects = {
+      a_object: {
+        title: 'this is an object',
+        description: 'one of its attributes is a list',
+        a_list: [{label: 'listitem1'}, {label: 'listitem2'}]
+      }
+    };
+
+This is our template:
+
+    {{#a_object}}
+      <h1>{{title}}</h1>
+      <p>{{description}}</p>
+      <ul>
+        {{#a_list}}
+          <li>{{label}}</li>
+        {{/a_list}}
+      </ul>
+    {{/a_object}}
+
+Here is the result:
+
+    <h1>this is an object</h1>
+      <p>one of its attributes is a list</p>
+      <ul>
+        <li>listitem1</li>
+        <li>listitem2</li>
+      </ul>
+
+### Inverted Sections
+
+An inverted section opens with `{{^section}}` instead of `{{#section}}` and uses a
+boolean negative to evaluate. Empty arrays are considered falsy.
+
+View:
+
+    var inverted_section =  {
+      "repo": []
+    }
+
+Template:
+
+    {{#repo}}<b>{{name}}</b>{{/repo}}
+    {{^repo}}No repos :({{/repo}}
+
+Result:
+
+    No repos :(
+
+
 ### View Partials
 
 mustache.js supports a quite powerful but yet simple view partial mechanism. Use the
